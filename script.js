@@ -1,5 +1,9 @@
 'use strict';
 
+// ==========================================
+// CAMPUS LOST & FOUND
+// Standalone Frontend
+// ==========================================
 
 const $ = id => document.getElementById(id);
 
@@ -33,6 +37,10 @@ const today = () => {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
+
+// ==========================================
+// SAMPLE ITEMS
+// ==========================================
 
 const samples = [
     {
@@ -78,10 +86,15 @@ const samples = [
     }
 ];
 
+
 let items = samples.map(item => ({ ...item }));
 
 let storageWarning = '';
-\
+
+
+// ==========================================
+// LOAD SAVED ITEMS
+// ==========================================
 
 try {
 
@@ -146,6 +159,11 @@ try {
         'Saved data could not be loaded. Showing sample reports.';
 }
 
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
 function text(tag, content, className) {
 
     const el = document.createElement(tag);
@@ -169,6 +187,11 @@ function option(select, value, label) {
     select.append(el);
 }
 
+
+// ==========================================
+// CATEGORY OPTIONS
+// ==========================================
+
 for (const category of categories) {
 
     option(
@@ -185,6 +208,9 @@ for (const category of categories) {
 }
 
 
+// ==========================================
+// ITEM IMAGE
+// ==========================================
 
 function photo(item, className) {
 
@@ -249,6 +275,9 @@ function photo(item, className) {
 }
 
 
+// ==========================================
+// FORMAT DATE
+// ==========================================
 
 function formatDate(value) {
 
@@ -267,6 +296,10 @@ function formatDate(value) {
         );
 }
 
+
+// ==========================================
+// LOCATION FILTER
+// ==========================================
 
 function refreshLocations() {
 
@@ -314,6 +347,10 @@ function refreshLocations() {
             : 'all';
 }
 
+
+// ==========================================
+// DASHBOARD STATS
+// ==========================================
 
 function stats() {
 
@@ -398,6 +435,10 @@ function stats() {
     );
 }
 
+
+// ==========================================
+// RENDER ITEMS
+// ==========================================
 
 function render() {
 
@@ -621,6 +662,10 @@ function render() {
 }
 
 
+// ==========================================
+// ITEM DETAILS MODAL
+// ==========================================
+
 function openDetails(item) {
 
     const body =
@@ -772,6 +817,9 @@ function openDetails(item) {
 }
 
 
+// ==========================================
+// MODAL CONTROLS
+// ==========================================
 
 $('modalClose')
     .addEventListener(
@@ -822,6 +870,10 @@ $('itemModal')
     );
 
 
+// ==========================================
+// TOAST
+// ==========================================
+
 let toastTimer;
 
 
@@ -849,6 +901,9 @@ function toast(message) {
 }
 
 
+// ==========================================
+// IMAGE UPLOAD
+// ==========================================
 
 let selectedImageData = '';
 
@@ -888,6 +943,10 @@ imageFile.addEventListener(
     }
 );
 
+
+// ==========================================
+// DRAG & DROP
+// ==========================================
 
 [
     'dragenter',
@@ -939,6 +998,11 @@ dropZone.addEventListener(
         }
     }
 );
+
+
+// ==========================================
+// PROCESS IMAGE
+// ==========================================
 
 function processImage(file) {
 
@@ -1016,6 +1080,11 @@ function processImage(file) {
 
     reader.readAsDataURL(file);
 }
+
+
+// ==========================================
+// REPORT FORM SUBMISSION
+// ==========================================
 
 $('reportForm')
     .addEventListener(
@@ -1176,6 +1245,11 @@ $('reportForm')
         }
     );
 
+
+// ==========================================
+// FILTERS
+// ==========================================
+
 $('filters')
     .addEventListener(
         'submit',
@@ -1213,6 +1287,11 @@ $('filters')
                 0
             )
     );
+
+
+// ==========================================
+// HOW IT WORKS
+// ==========================================
 
 const steps = [
 
@@ -1279,6 +1358,9 @@ const steps = [
     );
 
 
+// ==========================================
+// ROUTING
+// ==========================================
 
 function route() {
 
@@ -1409,6 +1491,10 @@ function route() {
 }
 
 
+// ==========================================
+// MOBILE MENU
+// ==========================================
+
 $('menu')
     .addEventListener(
         'click',
@@ -1437,6 +1523,10 @@ window.addEventListener(
     route
 );
 
+
+// ==========================================
+// INITIALIZE
+// ==========================================
 
 $('reportForm')
     .elements
