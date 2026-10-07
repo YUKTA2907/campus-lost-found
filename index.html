@@ -1,17 +1,175 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Campus Lost & Found</title>
 
-    <link rel="stylesheet" href="style.css" />
-  </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-  <body>
-    <h1>Campus Lost & Found</h1>
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+        <div class="logo">
+            <h2>Campus Lost & Found</h2>
+        </div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#items">Browse</a>
+            <a href="#report">Report Item</a>
+        </nav>
+    </header>
+
+
+    <!-- ================= HOME ================= -->
+
+    <main>
+
+        <section id="home" class="hero">
+
+            <h1>Campus Lost & Found</h1>
+
+            <p>
+                Find it. Report it. Return it.
+            </p>
+
+            <div class="hero-buttons">
+
+                <button id="reportLostBtn">
+                    Report Lost Item
+                </button>
+
+                <button id="reportFoundBtn">
+                    Report Found Item
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SEARCH ================= -->
+
+        <section class="search-section">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search items..."
+            >
+
+
+            <select id="typeFilter">
+
+                <option value="all">
+                    Lost & Found
+                </option>
+
+                <option value="lost">
+                    Lost
+                </option>
+
+                <option value="found">
+                    Found
+                </option>
+
+            </select>
+
+
+            <select id="categoryFilter">
+
+                <option value="all">
+                    All Categories
+                </option>
+
+                <option value="Electronics">
+                    Electronics
+                </option>
+
+                <option value="Documents">
+                    Documents
+                </option>
+
+                <option value="Accessories">
+                    Accessories
+                </option>
+
+                <option value="Books">
+                    Books
+                </option>
+
+                <option value="Clothing">
+                    Clothing
+                </option>
+
+                <option value="Keys">
+                    Keys
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+        </section>
+
+
+        <!-- ================= ITEMS ================= -->
+
+        <section id="items">
+
+            <h2>Recent Items</h2>
+
+            <div id="itemsContainer">
+
+                <!-- Sahana's JavaScript will
+                     generate item cards here -->
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= REPORT ================= -->
+
+        <section id="report">
+
+            <h2>Report an Item</h2>
+
+            <p>
+                Lost or found something on campus?
+                Report it here.
+            </p>
+
+            <!-- Actual form comes in a later step -->
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            Campus Lost & Found
+        </p>
+
+    </footer>
+
 
     <script src="script.js"></script>
-  </body>
+
+</body>
+
 </html>
