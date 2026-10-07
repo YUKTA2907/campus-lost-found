@@ -2,438 +2,460 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <meta
-      name="description"
-      content="Campus Lost & Found - Report lost items, post found items, and help return belongings to their owners."
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#172d53" />
 
     <title>Campus Lost & Found</title>
 
     <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
   </head>
 
   <body>
-    <!-- ================= HEADER ================= -->
+    <!-- =========================
+         HEADER / NAVIGATION
+    ========================== -->
 
-    <header class="navbar">
-      <div class="nav-container">
-        <a href="#home" class="logo">
-          <div class="logo-icon">⌖</div>
-
-          <div>
-            <h2>Campus Lost & Found</h2>
-            <span>Lost it? Found it? Let's reunite it.</span>
-          </div>
+    <header>
+      <nav class="container">
+        <a class="brand" href="#/">
+          <span class="brand-icon">♧</span>
+          Campus Lost & Found
         </a>
 
-        <nav class="nav-links">
-          <a href="#home">Home</a>
-          <a href="#items">Browse Items</a>
-          <a href="#report">Report Item</a>
-        </nav>
-
-        <button
-          class="mobile-menu-btn"
-          id="mobileMenuBtn"
-          aria-label="Open navigation menu"
-        >
+        <button id="menu" aria-label="Toggle navigation" aria-expanded="false">
           ☰
         </button>
-      </div>
 
-      <div class="mobile-nav" id="mobileNav">
-        <a href="#home">Home</a>
-        <a href="#items">Browse Items</a>
-        <a href="#report">Report Item</a>
-      </div>
+        <div id="navLinks">
+          <a href="#/">Home</a>
+          <a href="#/browse">Browse Items</a>
+          <a href="#/report">Report Item</a>
+          <a href="#/how-it-works">How It Works</a>
+
+          <a class="button navy" href="#/report"> ＋ Report an Item </a>
+        </div>
+      </nav>
     </header>
 
-    <!-- ================= MAIN ================= -->
-
     <main>
-      <!-- ================= HERO ================= -->
+      <!-- =========================
+             HOME HERO
+        ========================== -->
 
-      <section id="home" class="hero">
-        <div class="hero-content">
-          <div class="hero-badge">CAMPUS COMMUNITY</div>
+      <section id="homeHero" class="hero">
+        <div class="hero-inner">
+          <span class="live">
+            <i></i>
+            Your campus community board
+          </span>
 
           <h1>
-            Lost something?
-            <span>Let's find it.</span>
+            Lost it? Found it?<br />
+            Let's reunite it.
           </h1>
 
           <p>
-            A simple and secure way for students to report lost belongings, post
-            found items, and help return them to their rightful owners.
+            One place for your campus community to report, search and recover
+            lost belongings.
           </p>
 
-          <div class="hero-buttons">
-            <button class="btn btn-lost" id="reportLostBtn">
-              Report Lost Item
-            </button>
+          <div class="actions">
+            <a class="button red" href="#/report?type=lost">
+              △ Report Lost Item
+            </a>
 
-            <button class="btn btn-found" id="reportFoundBtn">
-              Report Found Item
-            </button>
+            <a class="button green" href="#/report?type=found">
+              ♧ Report Found Item
+            </a>
           </div>
-        </div>
-
-        <div class="hero-visual">
-          <div class="visual-card main-card">
-            <div class="visual-icon">⌖</div>
-
-            <h3>Lost it?</h3>
-
-            <p>
-              Report your missing item and let your campus community help you
-              find it.
-            </p>
-          </div>
-
-          <div class="floating-card floating-one">🔑 Keys</div>
-
-          <div class="floating-card floating-two">🎒 Backpack</div>
-
-          <div class="floating-card floating-three">📱 Phone</div>
         </div>
       </section>
 
-      <!-- ================= STATS ================= -->
+      <!-- =========================
+             BROWSE ITEMS
+        ========================== -->
 
-      <section class="stats-section">
-        <div class="stat">
-          <strong id="totalItems">0</strong>
-          <span>Total Reports</span>
+      <section id="browsePage" class="container page">
+        <div id="browseHeading">
+          <span class="eyebrow"> THE CAMPUS COMMUNITY BOARD </span>
+
+          <h1>Browse Items</h1>
+
+          <p class="muted">
+            A small detail could bring someone's belongings home.
+          </p>
         </div>
 
-        <div class="stat">
-          <strong id="lostCount">0</strong>
-          <span>Lost Items</span>
-        </div>
+        <!-- DASHBOARD STATS -->
 
-        <div class="stat">
-          <strong id="foundCount">0</strong>
-          <span>Found Items</span>
-        </div>
+        <div class="stats" id="stats"></div>
 
-        <div class="stat">
-          <strong id="returnedCount">0</strong>
-          <span>Returned</span>
-        </div>
-      </section>
+        <!-- FILTERS -->
 
-      <!-- ================= BROWSE ITEMS ================= -->
-
-      <section id="items" class="items-section">
-        <div class="section-heading">
-          <div>
-            <span class="section-label">COMMUNITY REPORTS</span>
-            <h2>Lost & Found Items</h2>
-          </div>
-
-          <p>Browse recent reports from around campus.</p>
-        </div>
-
-        <!-- SEARCH AND FILTERS -->
-
-        <div class="filter-container">
-          <div class="search-box">
+        <form id="filters" class="panel filters">
+          <label class="search">
             <span>⌕</span>
 
             <input
-              type="text"
-              id="searchInput"
-              placeholder="Search by item, location or description..."
+              id="search"
+              placeholder="Search for an item, description or location…"
+              aria-label="Search items"
             />
+          </label>
+
+          <div class="filter-grid">
+            <label>
+              STATUS
+
+              <select id="typeFilter">
+                <option value="all">All Items</option>
+                <option value="lost">Lost</option>
+                <option value="found">Found</option>
+              </select>
+            </label>
+
+            <label>
+              CATEGORY
+
+              <select id="categoryFilter">
+                <option value="all">All Categories</option>
+              </select>
+            </label>
+
+            <label>
+              LOCATION
+
+              <select id="locationFilter">
+                <option value="all">All Locations</option>
+              </select>
+            </label>
+
+            <label>
+              DATE
+
+              <select id="dateFilter">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+              </select>
+            </label>
           </div>
 
-          <select id="typeFilter">
-            <option value="all">Lost & Found</option>
+          <div class="filter-bottom">
+            <span id="results" aria-live="polite"> </span>
 
-            <option value="lost">Lost Items</option>
+            <button type="reset" class="text-button">↻ Reset Filters</button>
+          </div>
+        </form>
 
-            <option value="found">Found Items</option>
-          </select>
+        <!-- LISTINGS -->
 
-          <select id="categoryFilter">
-            <option value="all">All Categories</option>
+        <div class="listing-heading">
+          <div>
+            <h2 id="listingTitle">Recent Listings</h2>
 
-            <option value="Electronics">Electronics</option>
+            <p class="muted">Browse items reported by your campus community</p>
+          </div>
 
-            <option value="Documents">Documents</option>
-
-            <option value="Accessories">Accessories</option>
-
-            <option value="Books">Books</option>
-
-            <option value="Clothing">Clothing</option>
-
-            <option value="Keys">Keys</option>
-
-            <option value="Bags">Bags</option>
-
-            <option value="Other">Other</option>
-          </select>
+          <span class="demo-label"> Local demo </span>
         </div>
-
-        <!-- ITEM CARDS -->
 
         <div id="itemsContainer" class="items-grid"></div>
 
-        <!-- EMPTY STATE -->
+        <!-- EMPTY SEARCH RESULT -->
 
-        <div id="emptyState" class="empty-state">
-          <div class="empty-icon">⌕</div>
+        <div id="empty" class="panel empty" hidden>
+          <span>⌕</span>
 
-          <h3>No items found</h3>
+          <h2>No matching items</h2>
 
-          <p>Try changing your search or filter.</p>
+          <p>Try another keyword or reset your filters.</p>
         </div>
+
+        <!-- HOW IT WORKS ON HOME -->
+
+        <div id="homeSteps" class="panel steps"></div>
+
+        <!-- SAFETY MESSAGE -->
+
+        <p class="safety">
+          ◇
+          <strong>Stay safe.</strong>
+          Verify ownership and meet in a public campus location when exchanging
+          belongings.
+        </p>
       </section>
 
-      <!-- ================= REPORT ITEM ================= -->
+      <!-- =========================
+             REPORT LOST / FOUND ITEM
+        ========================== -->
 
-      <section id="report" class="report-section">
-        <div class="report-heading">
-          <span class="section-label"> HELP YOUR CAMPUS </span>
+      <section id="reportPage" class="report page" hidden>
+        <a class="back" href="#/"> ← Back to Home </a>
 
-          <h2>Report an Item</h2>
+        <h1>Report a Lost or Found Item</h1>
 
-          <p>
-            Lost something or found an item? Add the details below so the campus
-            community can help.
-          </p>
-        </div>
+        <p class="muted intro">
+          Fill in the details below so others can help reunite items with their
+          owners.
+        </p>
 
-        <div class="report-card">
-          <form id="reportForm">
-            <!-- LOST / FOUND -->
+        <form id="reportForm" class="panel report-form">
+          <!-- LOST / FOUND SELECTION -->
 
-            <div class="form-group">
-              <label> Report Type * </label>
+          <fieldset class="type-options">
+            <legend class="sr-only">Report type</legend>
 
-              <div class="type-selector">
-                <label class="type-option lost-option">
-                  <input type="radio" name="type" value="lost" checked />
+            <!-- LOST -->
 
-                  <span>
-                    <strong>Lost</strong>
-                    I lost something
-                  </span>
-                </label>
+            <label class="type-option">
+              <input type="radio" name="type" value="lost" checked required />
 
-                <label class="type-option found-option">
-                  <input type="radio" name="type" value="found" />
+              <span class="type-symbol lost"> △ </span>
 
-                  <span>
-                    <strong>Found</strong>
-                    I found something
-                  </span>
-                </label>
-              </div>
-            </div>
+              <span>
+                <strong> I Lost Something </strong>
 
-            <div class="form-row">
-              <!-- ITEM NAME -->
+                <small> Report an item you've misplaced </small>
+              </span>
+            </label>
 
-              <div class="form-group">
-                <label for="itemName"> Item Name * </label>
+            <!-- FOUND -->
 
-                <input
-                  type="text"
-                  id="itemName"
-                  placeholder="e.g. Black Wallet"
-                  required
-                />
-              </div>
+            <label class="type-option">
+              <input type="radio" name="type" value="found" />
 
-              <!-- CATEGORY -->
+              <span class="type-symbol found"> ♧ </span>
 
-              <div class="form-group">
-                <label for="itemCategory"> Category * </label>
+              <span>
+                <strong> I Found Something </strong>
 
-                <select id="itemCategory" required>
-                  <option value="">Select category</option>
+                <small> Report an item you've discovered </small>
+              </span>
+            </label>
+          </fieldset>
 
-                  <option value="Electronics">Electronics</option>
+          <!-- =========================
+                     ITEM DETAILS
+                ========================== -->
 
-                  <option value="Documents">Documents</option>
+          <div class="form-grid">
+            <!-- ITEM NAME -->
 
-                  <option value="Accessories">Accessories</option>
+            <label>
+              Item Name <b>*</b>
 
-                  <option value="Books">Books</option>
+              <input
+                name="name"
+                maxlength="100"
+                placeholder="e.g. Black leather wallet"
+                required
+              />
+            </label>
 
-                  <option value="Clothing">Clothing</option>
+            <!-- CATEGORY -->
 
-                  <option value="Keys">Keys</option>
+            <label>
+              Category <b>*</b>
 
-                  <option value="Bags">Bags</option>
-
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
+              <select name="category" id="itemCategory" required>
+                <option value="">Select a category</option>
+              </select>
+            </label>
 
             <!-- DESCRIPTION -->
 
-            <div class="form-group">
-              <label for="itemDescription"> Description * </label>
+            <label class="full">
+              Description <b>*</b>
 
               <textarea
-                id="itemDescription"
+                name="description"
                 rows="4"
-                placeholder="Describe the item, colour, brand, identifying features, etc."
+                maxlength="1500"
+                placeholder="Describe the item — colour, brand, identifying features, etc."
                 required
               ></textarea>
-            </div>
+            </label>
 
-            <div class="form-row">
-              <!-- LOCATION -->
+            <!-- LOCATION -->
 
-              <div class="form-group">
-                <label for="itemLocation"> Location * </label>
+            <label>
+              Location <b>*</b>
+
+              <input
+                name="location"
+                maxlength="100"
+                placeholder="e.g. Central Library, Block C"
+                required
+              />
+            </label>
+
+            <!-- DATE -->
+
+            <label>
+              Date <b>*</b>
+
+              <input name="date" type="date" required />
+            </label>
+
+            <!-- TIME -->
+
+            <label>
+              Time
+
+              <span class="muted"> optional </span>
+
+              <input name="time" type="time" />
+            </label>
+
+            <!-- CONTACT NAME -->
+
+            <label>
+              Contact Name <b>*</b>
+
+              <input
+                name="contactName"
+                placeholder="Your name"
+                maxlength="80"
+                required
+              />
+            </label>
+
+            <!-- CONTACT PHONE / EMAIL -->
+
+            <label class="full">
+              Contact Phone / Email <b>*</b>
+
+              <input
+                name="contact"
+                placeholder="Your phone number or email"
+                maxlength="150"
+                required
+              />
+            </label>
+
+            <!-- =========================
+                         IMAGE FILE UPLOAD
+                    ========================== -->
+
+            <div class="full">
+              <label>
+                Item Photo
+                <span class="muted"> optional </span>
+              </label>
+
+              <div id="dropZone" class="upload-box">
+                <div class="upload-icon">📷</div>
+
+                <strong> Drag & drop your image here </strong>
+
+                <p>or</p>
+
+                <button type="button" id="chooseImage" class="choose-image-btn">
+                  Choose Image
+                </button>
 
                 <input
-                  type="text"
-                  id="itemLocation"
-                  placeholder="e.g. Library, Block C"
-                  required
+                  id="imageFile"
+                  name="imageFile"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
                 />
-              </div>
 
-              <!-- DATE -->
+                <small> JPG, PNG or WEBP • Maximum 2 MB </small>
 
-              <div class="form-group">
-                <label for="itemDate"> Date * </label>
-
-                <input type="date" id="itemDate" required />
+                <p id="selectedFileName" class="selected-file"></p>
               </div>
             </div>
+          </div>
 
-            <div class="form-row">
-              <!-- CONTACT -->
+          <!-- =========================
+                     IMAGE PREVIEW
+                ========================== -->
 
-              <div class="form-group">
-                <label for="itemContact"> Contact Information * </label>
+          <div id="previewBox" class="image-preview" hidden>
+            <img id="preview" alt="Item image preview" />
 
-                <input
-                  type="text"
-                  id="itemContact"
-                  placeholder="Phone number or email"
-                  required
-                />
-              </div>
+            <p id="previewMessage" aria-live="polite"></p>
+          </div>
 
-              <!-- IMAGE URL -->
+          <!-- FORM ERROR -->
 
-              <div class="form-group">
-                <label for="itemImage"> Image URL </label>
+          <p id="formError" class="error" role="alert"></p>
 
-                <input
-                  type="url"
-                  id="itemImage"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-            </div>
+          <!-- SUBMIT -->
 
-            <button type="submit" class="submit-btn">Submit Report</button>
-          </form>
-        </div>
+          <button class="button navy submit" type="submit">
+            ＋ Submit Report
+          </button>
+
+          <p class="form-note">
+            Reports are saved in this browser. Your contact details appear in
+            the item details.
+          </p>
+        </form>
       </section>
 
-      <!-- ================= HOW IT WORKS ================= -->
+      <!-- =========================
+             HOW IT WORKS PAGE
+        ========================== -->
 
-      <section class="how-section">
-        <div class="report-heading">
-          <span class="section-label"> SIMPLE & QUICK </span>
+      <section id="howPage" class="container page" hidden>
+        <span class="eyebrow"> SIMPLE & QUICK </span>
 
-          <h2>How It Works</h2>
-        </div>
+        <h1>How It Works</h1>
 
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-number">1</div>
+        <p class="muted intro">
+          A little help from your campus community goes a long way.
+        </p>
 
-            <h3>Report</h3>
+        <div id="howSteps" class="panel steps"></div>
 
-            <p>Submit the details of the item you lost or found.</p>
-          </div>
+        <div class="panel tips">
+          <h2>Make your report useful</h2>
 
-          <div class="step-card">
-            <div class="step-number">2</div>
+          <p>
+            Add a clear photo, the location, date and identifying details.
+            Search existing reports for possible matches, then contact the
+            reporter to verify ownership.
+          </p>
 
-            <h3>Search</h3>
-
-            <p>Browse reports and search for matching belongings.</p>
-          </div>
-
-          <div class="step-card">
-            <div class="step-number">3</div>
-
-            <h3>Connect</h3>
-
-            <p>Contact the person who reported a possible match.</p>
-          </div>
-
-          <div class="step-card">
-            <div class="step-number">4</div>
-
-            <h3>Reunite</h3>
-
-            <p>Verify ownership and safely return the item.</p>
-          </div>
+          <a class="button navy" href="#/report"> Report an Item </a>
         </div>
       </section>
     </main>
 
-    <!-- ================= FOOTER ================= -->
+    <!-- =========================
+         FOOTER
+    ========================== -->
 
     <footer>
-      <div class="footer-content">
-        <div>
-          <h3>Campus Lost & Found</h3>
+      <div class="container">
+        <a class="brand" href="#/"> ♧ Campus Lost & Found </a>
 
-          <p>Helping students reconnect with their belongings.</p>
-        </div>
-
-        <div class="footer-links">
-          <a href="#home"> Home </a>
-
-          <a href="#items"> Browse </a>
-
-          <a href="#report"> Report Item </a>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>© 2026 Campus Lost & Found</p>
-
-        <p>Built for the campus community.</p>
+        <p>
+          Lost it? Found it? Let's reunite it. — A campus community project.
+        </p>
       </div>
     </footer>
 
-    <!-- ================= TOAST ================= -->
+    <!-- =========================
+         ITEM DETAILS MODAL
+    ========================== -->
 
-    <div id="toast" class="toast">Item reported successfully!</div>
+    <dialog id="itemModal">
+      <button id="modalClose" class="close" aria-label="Close details">
+        ×
+      </button>
 
-    <!-- ================= ITEM DETAILS MODAL ================= -->
+      <div id="modalBody"></div>
+    </dialog>
 
-    <div id="itemModal" class="modal">
-      <div class="modal-overlay" id="modalOverlay"></div>
+    <!-- TOAST MESSAGE -->
 
-      <div class="modal-content">
-        <button class="modal-close" id="modalClose" aria-label="Close">
-          ×
-        </button>
-
-        <div id="modalBody"></div>
-      </div>
-    </div>
-
-    <script src="firebase.js"></script>
-    <script src="script.js"></script>
+    <div id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

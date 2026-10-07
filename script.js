@@ -1,172 +1,277 @@
+'use strict';
+
 // ==========================================
 // CAMPUS LOST & FOUND
+// Standalone Frontend
 // ==========================================
 
+const $ = id => document.getElementById(id);
+
+const categories = [
+    'Electronics',
+    'Documents',
+    'Accessories',
+    'Books',
+    'Clothing',
+    'Keys',
+    'Bags',
+    'Other'
+];
+
+const icons = {
+    Electronics: '📱',
+    Documents: '📄',
+    Accessories: '👛',
+    Books: '📚',
+    Clothing: '👕',
+    Keys: '🔑',
+    Bags: '🎒',
+    Other: '📦'
+};
+
+const storageKey = 'campusLostFoundItems';
+
+const today = () => {
+    const d = new Date();
+
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 
 // ==========================================
-// DEFAULT SAMPLE DATA
+// SAMPLE ITEMS
 // ==========================================
 
-const defaultItems = [
-
+const samples = [
     {
-        id: 1,
-        type: "lost",
-        name: "Black Wallet",
-        category: "Accessories",
-        description: "Black leather wallet with college ID inside.",
-        location: "Library",
-        date: "2026-10-07",
-        contact: "9876543210",
-        imageURL: "",
-        status: "active"
+        id: 'demo-wallet',
+        type: 'lost',
+        name: 'Black Wallet',
+        category: 'Accessories',
+        description: 'Black leather wallet with a college ID inside. Sample report for the frontend demo.',
+        location: 'Library',
+        date: today(),
+        contact: 'Demo report — replace with your own contact',
+        contactName: 'Sample reporter',
+        imageData: '',
+        status: 'active'
     },
 
     {
-        id: 2,
-        type: "found",
-        name: "Blue Water Bottle",
-        category: "Other",
-        description: "Blue water bottle found near Block C.",
-        location: "Block C",
-        date: "2026-10-07",
-        contact: "9876500000",
-        imageURL: "",
-        status: "active"
+        id: 'demo-bottle',
+        type: 'found',
+        name: 'Blue Water Bottle',
+        category: 'Other',
+        description: 'Blue water bottle found near Block C. Sample report for the frontend demo.',
+        location: 'Block C',
+        date: today(),
+        contact: 'Demo report — replace with your own contact',
+        contactName: 'Sample reporter',
+        imageData: '',
+        status: 'active'
     },
 
     {
-        id: 3,
-        type: "lost",
-        name: "Calculator",
-        category: "Electronics",
-        description: "Black scientific calculator lost near the CS Block.",
-        location: "CS Block",
-        date: "2026-10-06",
-        contact: "9876511111",
-        imageURL: "",
-        status: "active"
+        id: 'demo-calculator',
+        type: 'lost',
+        name: 'Calculator',
+        category: 'Electronics',
+        description: 'Black scientific calculator misplaced near the CS Block. Sample report for the frontend demo.',
+        location: 'CS Block',
+        date: today(),
+        contact: 'Demo report — replace with your own contact',
+        contactName: 'Sample reporter',
+        imageData: '',
+        status: 'active'
     }
-
 ];
 
 
+let items = samples.map(item => ({ ...item }));
+
+let storageWarning = '';
+
+
 // ==========================================
-// LOAD ITEMS
+// LOAD SAVED ITEMS
 // ==========================================
 
-let items = [];
+try {
 
-const storedItems = localStorage.getItem("campusLostFoundItems");
+    const saved = localStorage.getItem(storageKey);
 
-if (storedItems) {
+    if (saved !== null) {
 
-    try {
+        const parsed = JSON.parse(saved);
 
-        items = JSON.parse(storedItems);
+        if (!Array.isArray(parsed)) {
+            throw new Error('Invalid saved data');
+        }
 
-    } catch (error) {
+        items = parsed
+            .filter(item =>
+                item &&
+                typeof item === 'object' &&
+                ['lost', 'found'].includes(item.type)
+            )
+            .map(item => ({
+                ...item,
 
-        console.error("Could not read saved items:", error);
+                id: String(item.id),
 
-        items = [...defaultItems];
+                name: String(
+                    item.name || 'Unnamed item'
+                ),
 
+                category: String(
+                    item.category || 'Other'
+                ),
+
+                description: String(
+                    item.description || ''
+                ),
+
+                location: String(
+                    item.location || ''
+                ),
+
+                date: String(
+                    item.date || ''
+                ),
+
+                contact: String(
+                    item.contact || ''
+                ),
+
+                contactName: String(
+                    item.contactName || ''
+                ),
+
+                imageData: String(
+                    item.imageData || item.imageURL || ''
+                )
+            }));
     }
 
-} else {
+} catch (error) {
 
-    items = [...defaultItems];
-
-    saveItems();
-
+    storageWarning =
+        'Saved data could not be loaded. Showing sample reports.';
 }
 
 
 // ==========================================
-// DOM ELEMENTS
+// HELPER FUNCTIONS
 // ==========================================
 
-const itemsContainer =
-    document.getElementById("itemsContainer");
+function text(tag, content, className) {
 
-const searchInput =
-    document.getElementById("searchInput");
+    const el = document.createElement(tag);
 
-const typeFilter =
-    document.getElementById("typeFilter");
+    el.textContent = content;
 
-const categoryFilter =
-    document.getElementById("categoryFilter");
+    if (className) {
+        el.className = className;
+    }
 
-const emptyState =
-    document.getElementById("emptyState");
+    return el;
+}
 
-const reportForm =
-    document.getElementById("reportForm");
 
-const reportLostBtn =
-    document.getElementById("reportLostBtn");
+function option(select, value, label) {
 
-const reportFoundBtn =
-    document.getElementById("reportFoundBtn");
+    const el = text('option', label);
 
-const toast =
-    document.getElementById("toast");
+    el.value = value;
 
-const itemModal =
-    document.getElementById("itemModal");
-
-const modalBody =
-    document.getElementById("modalBody");
-
-const modalClose =
-    document.getElementById("modalClose");
-
-const modalOverlay =
-    document.getElementById("modalOverlay");
-
-const mobileMenuBtn =
-    document.getElementById("mobileMenuBtn");
-
-const mobileNav =
-    document.getElementById("mobileNav");
+    select.append(el);
+}
 
 
 // ==========================================
-// SAVE ITEMS
+// CATEGORY OPTIONS
 // ==========================================
 
-function saveItems() {
+for (const category of categories) {
 
-    localStorage.setItem(
-        "campusLostFoundItems",
-        JSON.stringify(items)
+    option(
+        $('categoryFilter'),
+        category,
+        category
     );
 
+    option(
+        $('itemCategory'),
+        category,
+        category
+    );
 }
 
 
 // ==========================================
-// CATEGORY ICON
+// ITEM IMAGE
 // ==========================================
 
-function getCategoryIcon(category) {
+function photo(item, className) {
 
-    const icons = {
+    const wrapper =
+        document.createElement('div');
 
-        Electronics: "📱",
-        Documents: "📄",
-        Accessories: "👛",
-        Books: "📚",
-        Clothing: "👕",
-        Keys: "🔑",
-        Bags: "🎒",
-        Other: "📦"
+    wrapper.className = className;
 
-    };
 
-    return icons[category] || "📦";
+    const fallback = text(
+        'div',
+        icons[item.category] || '📦',
+        'placeholder'
+    );
 
+    wrapper.append(fallback);
+
+
+    const source = item.imageData || item.imageURL || '';
+
+    if (source) {
+
+        const img = new Image();
+
+        img.alt = item.name;
+
+        img.loading = 'lazy';
+
+        img.hidden = true;
+
+
+        img.addEventListener(
+            'load',
+            () => {
+
+                fallback.hidden = true;
+
+                img.hidden = false;
+            }
+        );
+
+
+        img.addEventListener(
+            'error',
+            () => {
+
+                img.remove();
+
+                fallback.title =
+                    'Image unavailable.';
+            }
+        );
+
+
+        img.src = source;
+
+        wrapper.append(img);
+    }
+
+
+    return wrapper;
 }
 
 
@@ -174,741 +279,1278 @@ function getCategoryIcon(category) {
 // FORMAT DATE
 // ==========================================
 
-function formatDate(dateString) {
+function formatDate(value) {
 
-    if (!dateString) {
-        return "Date unavailable";
-    }
+    const d =
+        new Date(value + 'T00:00:00');
 
-    const date =
-        new Date(dateString + "T00:00:00");
+    return Number.isNaN(d.getTime())
+        ? 'Date unavailable'
+        : d.toLocaleDateString(
+            'en-IN',
+            {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }
+        );
+}
 
-    return date.toLocaleDateString(
-        "en-IN",
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
+
+// ==========================================
+// LOCATION FILTER
+// ==========================================
+
+function refreshLocations() {
+
+    const current =
+        $('locationFilter').value;
+
+
+    $('locationFilter')
+        .replaceChildren();
+
+
+    option(
+        $('locationFilter'),
+        'all',
+        'All Locations'
     );
 
-}
 
+    [
+        ...new Set(
+            items
+                .map(x => x.location)
+                .filter(Boolean)
+        )
+    ]
+        .sort()
+        .forEach(location =>
+
+            option(
+                $('locationFilter'),
+                location,
+                location
+            )
 
-// ==========================================
-// ESCAPE HTML
-// ==========================================
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value == null ? "" : String(value);
-
-    return div.innerHTML;
-
-}
-
-
-// ==========================================
-// DISPLAY ITEMS
-// ==========================================
-
-function displayItems(itemsToDisplay) {
-
-    itemsContainer.innerHTML = "";
-
-    if (itemsToDisplay.length === 0) {
-
-        emptyState.style.display = "block";
-
-        return;
-
-    }
-
-    emptyState.style.display = "none";
-
-
-    itemsToDisplay.forEach(item => {
-
-        const card =
-            document.createElement("article");
-
-        card.className =
-            "item-card";
-
-
-        const imageContent =
-            item.imageURL
-
-            ? `
-                <img
-                    src="${escapeHTML(item.imageURL)}"
-                    alt="${escapeHTML(item.name)}"
-                    onerror="
-                        this.style.display='none';
-                        this.nextElementSibling.style.display='block';
-                    "
-                >
-
-                <div
-                    class="item-placeholder"
-                    style="display:none"
-                >
-                    ${getCategoryIcon(item.category)}
-                </div>
-              `
-
-            : `
-                <div class="item-placeholder">
-                    ${getCategoryIcon(item.category)}
-                </div>
-              `;
-
-
-        card.innerHTML = `
-
-            <div class="item-image">
-
-                ${imageContent}
-
-                <span
-                    class="
-                        status-badge
-                        ${
-                            item.type === "lost"
-                                ? "status-lost"
-                                : "status-found"
-                        }
-                    "
-                >
-
-                    ${
-                        item.type === "lost"
-                            ? "Lost"
-                            : "Found"
-                    }
-
-                </span>
-
-            </div>
-
-
-            <div class="item-content">
-
-                <span class="item-category">
-
-                    ${escapeHTML(item.category)}
-
-                </span>
-
-
-                <h3>
-
-                    ${escapeHTML(item.name)}
-
-                </h3>
-
-
-                <p class="item-description">
-
-                    ${escapeHTML(item.description)}
-
-                </p>
-
-
-                <div class="item-info">
-
-                    <span>
-                        📍 ${escapeHTML(item.location)}
-                    </span>
-
-                    <span>
-                        📅 ${formatDate(item.date)}
-                    </span>
-
-                </div>
-
-
-                <button
-                    class="view-btn"
-                    data-id="${item.id}"
-                >
-                    View Details
-                </button>
-
-            </div>
-
-        `;
-
-
-        itemsContainer.appendChild(card);
-
-    });
-
-
-    document
-        .querySelectorAll(".view-btn")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    openItemModal(
-                        Number(button.dataset.id)
-                    );
-
-                }
-            );
-
-        });
-
-}
-
-
-// ==========================================
-// FILTER ITEMS
-// ==========================================
-
-function filterItems() {
-
-    const searchValue =
-        searchInput.value
-            .toLowerCase()
-            .trim();
-
-    const selectedType =
-        typeFilter.value;
-
-    const selectedCategory =
-        categoryFilter.value;
-
-
-    const filteredItems =
-        items.filter(item => {
-
-            const matchesSearch =
-
-                item.name
-                    .toLowerCase()
-                    .includes(searchValue)
-
-                ||
-
-                item.description
-                    .toLowerCase()
-                    .includes(searchValue)
-
-                ||
-
-                item.location
-                    .toLowerCase()
-                    .includes(searchValue)
-
-                ||
-
-                item.category
-                    .toLowerCase()
-                    .includes(searchValue);
-
-
-            const matchesType =
-
-                selectedType === "all"
-
-                ||
-
-                item.type === selectedType;
-
-
-            const matchesCategory =
-
-                selectedCategory === "all"
-
-                ||
-
-                item.category === selectedCategory;
-
-
-            return (
-                matchesSearch &&
-                matchesType &&
-                matchesCategory
-            );
-
-        });
-
-
-    displayItems(filteredItems);
-
-}
-
-
-// ==========================================
-// UPDATE STATISTICS
-// ==========================================
-
-function updateStats() {
-
-    const total =
-        items.length;
-
-    const lost =
-        items.filter(
-            item => item.type === "lost"
-        ).length;
-
-    const found =
-        items.filter(
-            item => item.type === "found"
-        ).length;
-
-    const returned =
-        items.filter(
-            item => item.status === "returned"
-        ).length;
-
-
-    document.getElementById(
-        "totalItems"
-    ).textContent = total;
-
-
-    document.getElementById(
-        "lostCount"
-    ).textContent = lost;
-
-
-    document.getElementById(
-        "foundCount"
-    ).textContent = found;
-
-
-    document.getElementById(
-        "returnedCount"
-    ).textContent = returned;
-
-}
-
-
-// ==========================================
-// REPORT FORM
-// ==========================================
-
-reportForm.addEventListener(
-    "submit",
-    function (event) {
-
-        event.preventDefault();
-
-
-        const selectedType =
-            document.querySelector(
-                'input[name="type"]:checked'
-            ).value;
-
-
-        const newItem = {
-
-            id: Date.now(),
-
-            type: selectedType,
-
-            name:
-                document
-                    .getElementById("itemName")
-                    .value
-                    .trim(),
-
-            category:
-                document
-                    .getElementById("itemCategory")
-                    .value,
-
-            description:
-                document
-                    .getElementById("itemDescription")
-                    .value
-                    .trim(),
-
-            location:
-                document
-                    .getElementById("itemLocation")
-                    .value
-                    .trim(),
-
-            date:
-                document
-                    .getElementById("itemDate")
-                    .value,
-
-            contact:
-                document
-                    .getElementById("itemContact")
-                    .value
-                    .trim(),
-
-            imageURL:
-                document
-                    .getElementById("itemImage")
-                    .value
-                    .trim(),
-
-            status: "active"
-
-        };
-
-
-        items.unshift(newItem);
-
-
-        saveItems();
-
-        displayItems(items);
-
-        updateStats();
-
-
-        reportForm.reset();
-
-
-        document.querySelector(
-            'input[name="type"][value="lost"]'
-        ).checked = true;
-
-
-        setTodayDate();
-
-
-        showToast(
-            `${
-                selectedType === "lost"
-                    ? "Lost"
-                    : "Found"
-            } item reported successfully!`
         );
 
 
-        document
-            .getElementById("items")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-    }
-);
+    $('locationFilter').value =
+        [
+            ...$('locationFilter').options
+        ].some(
+            x => x.value === current
+        )
+            ? current
+            : 'all';
+}
 
 
 // ==========================================
-// HERO BUTTONS
+// DASHBOARD STATS
 // ==========================================
 
-reportLostBtn.addEventListener(
-    "click",
-    () => {
+function stats() {
 
-        document.querySelector(
-            'input[name="type"][value="lost"]'
-        ).checked = true;
+    const counts = [
+
+        [
+            'Total Reports',
+            items.length,
+            '▤'
+        ],
+
+        [
+            'Lost Items',
+            items.filter(
+                x => x.type === 'lost'
+            ).length,
+            '△'
+        ],
+
+        [
+            'Found Items',
+            items.filter(
+                x => x.type === 'found'
+            ).length,
+            '♧'
+        ],
+
+        [
+            'Returned Items',
+            items.filter(
+                x => x.status === 'returned'
+            ).length,
+            '✓'
+        ]
+    ];
 
 
-        document
-            .getElementById("report")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-    }
-);
+    $('stats').replaceChildren();
 
 
-reportFoundBtn.addEventListener(
-    "click",
-    () => {
+    counts.forEach(
+        ([label, count, icon]) => {
 
-        document.querySelector(
-            'input[name="type"][value="found"]'
-        ).checked = true;
+            const el =
+                text(
+                    'div',
+                    '',
+                    'stat'
+                );
 
 
-        document
-            .getElementById("report")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
+            el.append(
+                text(
+                    'span',
+                    icon,
+                    'stat-icon'
+                )
+            );
 
-    }
-);
+
+            const body =
+                document.createElement('div');
+
+
+            body.append(
+                text(
+                    'strong',
+                    count
+                ),
+
+                text(
+                    'small',
+                    label
+                )
+            );
+
+
+            el.append(body);
+
+            $('stats').append(el);
+        }
+    );
+}
+
+
+// ==========================================
+// RENDER ITEMS
+// ==========================================
+
+function render() {
+
+    const keyword =
+        $('search')
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const range =
+        $('dateFilter').value;
+
+
+    const day =
+        new Date(
+            today() + 'T00:00:00'
+        ).getTime();
+
+
+    const filtered =
+        items.filter(item => {
+
+            const itemDay =
+                new Date(
+                    item.date +
+                    'T00:00:00'
+                ).getTime();
+
+
+            const age =
+                Math.round(
+                    (day - itemDay) /
+                    86400000
+                );
+
+
+            return (
+
+                [
+                    item.name,
+                    item.description,
+                    item.location,
+                    item.category
+                ]
+                    .some(
+                        v =>
+                            String(v)
+                                .toLowerCase()
+                                .includes(keyword)
+                    )
+
+                &&
+
+                (
+                    $('typeFilter').value === 'all' ||
+                    item.type ===
+                    $('typeFilter').value
+                )
+
+                &&
+
+                (
+                    $('categoryFilter').value === 'all' ||
+                    item.category ===
+                    $('categoryFilter').value
+                )
+
+                &&
+
+                (
+                    $('locationFilter').value === 'all' ||
+                    item.location ===
+                    $('locationFilter').value
+                )
+
+                &&
+
+                (
+                    range === 'all' ||
+
+                    (
+                        range === 'today'
+                            ? age === 0
+                            : age >= 0 &&
+                              age < Number(range)
+                    )
+                )
+            );
+        });
+
+
+    $('itemsContainer')
+        .replaceChildren();
+
+
+    $('empty').hidden =
+        filtered.length !== 0;
+
+
+    $('results').textContent =
+        `${filtered.length} ${
+            filtered.length === 1
+                ? 'item'
+                : 'items'
+        } shown`;
+
+
+    filtered.forEach(item => {
+
+        const card =
+            text(
+                'article',
+                '',
+                'item-card'
+            );
+
+
+        const visual =
+            photo(
+                item,
+                'item-image'
+            );
+
+
+        visual.append(
+            text(
+                'span',
+                item.type === 'lost'
+                    ? 'LOST'
+                    : 'FOUND',
+
+                'badge ' + item.type
+            )
+        );
+
+
+        const body =
+            text(
+                'div',
+                '',
+                'item-content'
+            );
+
+
+        body.append(
+
+            text(
+                'span',
+                item.category,
+                'category'
+            ),
+
+            text(
+                'h3',
+                item.name
+            ),
+
+            text(
+                'p',
+                item.description,
+                'description'
+            )
+        );
+
+
+        const meta =
+            text(
+                'div',
+                '',
+                'item-meta'
+            );
+
+
+        meta.append(
+
+            text(
+                'span',
+                '⌖ ' + item.location
+            ),
+
+            text(
+                'span',
+                formatDate(item.date)
+            )
+        );
+
+
+        const btn =
+            text(
+                'button',
+                'View Details →',
+                'view-btn'
+            );
+
+
+        btn.type = 'button';
+
+
+        btn.addEventListener(
+            'click',
+            () => openDetails(item)
+        );
+
+
+        body.append(
+            meta,
+            btn
+        );
+
+
+        card.append(
+            visual,
+            body
+        );
+
+
+        $('itemsContainer')
+            .append(card);
+    });
+}
 
 
 // ==========================================
 // ITEM DETAILS MODAL
 // ==========================================
 
-function openItemModal(id) {
+function openDetails(item) {
 
-    const item =
-        items.find(
-            item => item.id === id
+    const body =
+        $('modalBody');
+
+
+    body.replaceChildren();
+
+
+    const visual =
+        photo(
+            item,
+            'item-image modal-image'
         );
 
 
-    if (!item) {
-        return;
-    }
+    body.append(
+
+        visual,
+
+        text(
+            'span',
+            item.type === 'lost'
+                ? 'Lost Item'
+                : 'Found Item',
+
+            'badge ' + item.type
+        ),
+
+        text(
+            'h2',
+            item.name
+        ),
+
+        text(
+            'p',
+            item.description,
+            'modal-description'
+        )
+    );
 
 
-    const image = item.imageURL
-
-        ? `
-            <img
-                src="${escapeHTML(item.imageURL)}"
-                class="modal-image"
-                alt="${escapeHTML(item.name)}"
-            >
-          `
-
-        : `
-            <div class="modal-placeholder">
-
-                ${getCategoryIcon(item.category)}
-
-            </div>
-          `;
+    const details =
+        text(
+            'div',
+            '',
+            'modal-details'
+        );
 
 
-    modalBody.innerHTML = `
+    [
+        ['Category', item.category],
+        ['Location', item.location],
+        ['Date', formatDate(item.date)],
+        ['Time', item.time],
+        ['Contact Name', item.contactName],
+        ['Contact', item.contact],
+        [
+            'Status',
+            item.status === 'returned'
+                ? 'Returned'
+                : 'Active'
+        ]
+    ]
+        .forEach(
+            ([label, value]) => {
 
-        ${image}
+                if (!value) return;
 
-        <span
-            class="
-                status-badge
-                ${
-                    item.type === "lost"
-                        ? "status-lost"
-                        : "status-found"
+
+                const row =
+                    document.createElement('p');
+
+
+                row.append(
+                    text(
+                        'strong',
+                        label + ': '
+                    )
+                );
+
+
+                if (
+                    label === 'Contact' &&
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                        .test(value)
+                ) {
+
+                    const link =
+                        text(
+                            'a',
+                            value
+                        );
+
+                    link.href =
+                        'mailto:' + value;
+
+                    row.append(link);
+
                 }
-            "
-            style="position:static; display:inline-block;"
-        >
 
-            ${
-                item.type === "lost"
-                    ? "Lost"
-                    : "Found"
+                else if (
+                    label === 'Contact' &&
+                    /^\+?[\d\s()-]{7,20}$/
+                        .test(value)
+                ) {
+
+                    const link =
+                        text(
+                            'a',
+                            value
+                        );
+
+                    link.href =
+                        'tel:' +
+                        value.replace(
+                            /[^+\d]/g,
+                            ''
+                        );
+
+                    row.append(link);
+
+                }
+
+                else {
+
+                    row.append(
+                        document.createTextNode(
+                            value
+                        )
+                    );
+                }
+
+
+                details.append(row);
             }
-
-        </span>
-
-
-        <h2>
-            ${escapeHTML(item.name)}
-        </h2>
+        );
 
 
-        <p class="modal-description">
-
-            ${escapeHTML(item.description)}
-
-        </p>
+    body.append(details);
 
 
-        <div class="modal-details">
+    $('itemModal')
+        .showModal();
 
-            <p>
-                <strong>Category:</strong>
-                ${escapeHTML(item.category)}
-            </p>
-
-            <p>
-                <strong>Location:</strong>
-                ${escapeHTML(item.location)}
-            </p>
-
-            <p>
-                <strong>Date:</strong>
-                ${formatDate(item.date)}
-            </p>
-
-            <p>
-                <strong>Contact:</strong>
-                ${escapeHTML(item.contact)}
-            </p>
-
-        </div>
-
-    `;
-
-
-    itemModal.classList.add("active");
 
     document.body.style.overflow =
-        "hidden";
-
+        'hidden';
 }
 
 
 // ==========================================
-// CLOSE MODAL
+// MODAL CONTROLS
 // ==========================================
 
-function closeModal() {
-
-    itemModal.classList.remove("active");
-
-    document.body.style.overflow = "";
-
-}
-
-
-modalClose.addEventListener(
-    "click",
-    closeModal
-);
+$('modalClose')
+    .addEventListener(
+        'click',
+        () =>
+            $('itemModal').close()
+    );
 
 
-modalOverlay.addEventListener(
-    "click",
-    closeModal
-);
+$('itemModal')
+    .addEventListener(
+        'close',
+        () => {
 
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "Escape") {
-
-            closeModal();
-
+            document.body.style.overflow =
+                '';
         }
+    );
 
-    }
-);
+
+$('itemModal')
+    .addEventListener(
+        'click',
+        event => {
+
+            if (
+                event.target ===
+                $('itemModal')
+            ) {
+
+                const r =
+                    $('itemModal')
+                        .getBoundingClientRect();
+
+
+                if (
+                    event.clientX < r.left ||
+                    event.clientX > r.right ||
+                    event.clientY < r.top ||
+                    event.clientY > r.bottom
+                ) {
+
+                    $('itemModal')
+                        .close();
+                }
+            }
+        }
+    );
 
 
 // ==========================================
 // TOAST
 // ==========================================
 
-function showToast(message) {
+let toastTimer;
 
-    toast.textContent =
+
+function toast(message) {
+
+    clearTimeout(toastTimer);
+
+    $('toast').textContent =
         message;
 
-    toast.classList.add("show");
+    $('toast')
+        .classList
+        .add('show');
 
 
-    setTimeout(
-        () => {
+    toastTimer =
+        setTimeout(
+            () =>
+                $('toast')
+                    .classList
+                    .remove('show'),
 
-            toast.classList.remove("show");
-
-        },
-        3000
-    );
-
+            4000
+        );
 }
 
 
 // ==========================================
-// SEARCH EVENTS
+// IMAGE UPLOAD
 // ==========================================
 
-searchInput.addEventListener(
-    "input",
-    filterItems
+let selectedImageData = '';
+
+const imageFile =
+    $('imageFile');
+
+const dropZone =
+    $('dropZone');
+
+const chooseImage =
+    $('chooseImage');
+
+const selectedFileName =
+    $('selectedFileName');
+
+
+// Open file picker
+
+chooseImage.addEventListener(
+    'click',
+    () => imageFile.click()
 );
 
 
-typeFilter.addEventListener(
-    "change",
-    filterItems
+// File selected normally
+
+imageFile.addEventListener(
+    'change',
+    () => {
+
+        const file =
+            imageFile.files[0];
+
+        if (file) {
+            processImage(file);
+        }
+    }
 );
 
 
-categoryFilter.addEventListener(
-    "change",
-    filterItems
+// ==========================================
+// DRAG & DROP
+// ==========================================
+
+[
+    'dragenter',
+    'dragover'
+]
+    .forEach(eventName => {
+
+        dropZone.addEventListener(
+            eventName,
+            event => {
+
+                event.preventDefault();
+
+                dropZone.classList
+                    .add('dragging');
+            }
+        );
+    });
+
+
+[
+    'dragleave',
+    'drop'
+]
+    .forEach(eventName => {
+
+        dropZone.addEventListener(
+            eventName,
+            event => {
+
+                event.preventDefault();
+
+                dropZone.classList
+                    .remove('dragging');
+            }
+        );
+    });
+
+
+dropZone.addEventListener(
+    'drop',
+    event => {
+
+        const file =
+            event.dataTransfer.files[0];
+
+        if (file) {
+            processImage(file);
+        }
+    }
 );
+
+
+// ==========================================
+// PROCESS IMAGE
+// ==========================================
+
+function processImage(file) {
+
+    $('formError').textContent = '';
+
+
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp'
+    ];
+
+
+    if (
+        !allowedTypes.includes(file.type)
+    ) {
+
+        $('formError').textContent =
+            'Please upload a JPG, PNG or WEBP image.';
+
+        return;
+    }
+
+
+    const maxSize =
+        2 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
+
+        $('formError').textContent =
+            'Image must be smaller than 2 MB.';
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = event => {
+
+        selectedImageData =
+            event.target.result;
+
+
+        $('preview').src =
+            selectedImageData;
+
+
+        $('preview').hidden =
+            false;
+
+
+        $('previewBox').hidden =
+            false;
+
+
+        $('previewMessage').textContent =
+            'This image will appear on your report.';
+
+
+        selectedFileName.textContent =
+            '✓ ' + file.name;
+    };
+
+
+    reader.onerror = () => {
+
+        $('formError').textContent =
+            'The image could not be read. Please try another image.';
+    };
+
+
+    reader.readAsDataURL(file);
+}
+
+
+// ==========================================
+// REPORT FORM SUBMISSION
+// ==========================================
+
+$('reportForm')
+    .addEventListener(
+        'submit',
+        event => {
+
+            event.preventDefault();
+
+
+            const form =
+                event.currentTarget;
+
+
+            const formData =
+                new FormData(form);
+
+
+            const values = {};
+
+
+            for (
+                const [key, value]
+                of formData.entries()
+            ) {
+
+                if (
+                    typeof value === 'string'
+                ) {
+
+                    values[key] =
+                        value.trim();
+                }
+            }
+
+
+            $('formError').textContent =
+                '';
+
+
+            if (
+                [
+                    'name',
+                    'category',
+                    'description',
+                    'location',
+                    'date',
+                    'contactName',
+                    'contact'
+                ]
+                    .some(
+                        key =>
+                            !values[key]
+                    )
+            ) {
+
+                $('formError').textContent =
+                    'Please complete every required field.';
+
+                return;
+            }
+
+
+            if (
+                values.date > today()
+            ) {
+
+                $('formError').textContent =
+                    'Choose today or an earlier date.';
+
+                return;
+            }
+
+
+            const item = {
+
+                ...values,
+
+                id:
+                    globalThis.crypto
+                        ?.randomUUID?.()
+                    ||
+                    String(Date.now()),
+
+                imageData:
+                    selectedImageData,
+
+                status:
+                    'active'
+            };
+
+
+            const next =
+                [
+                    item,
+                    ...items
+                ];
+
+
+            try {
+
+                localStorage.setItem(
+                    storageKey,
+                    JSON.stringify(next)
+                );
+
+            }
+
+            catch (error) {
+
+                $('formError').textContent =
+                    'The report could not be saved. The selected image may be too large for browser storage. Try a smaller image.';
+
+                return;
+            }
+
+
+            items = next;
+
+
+            form.reset();
+
+
+            selectedImageData = '';
+
+
+            selectedFileName.textContent =
+                '';
+
+
+            $('preview').src = '';
+
+
+            $('previewBox').hidden =
+                true;
+
+
+            form.elements.date.value =
+                today();
+
+
+            $('filters').reset();
+
+
+            refreshLocations();
+
+            stats();
+
+            render();
+
+
+            location.hash =
+                '#/browse';
+
+
+            toast(
+                'Your item was reported successfully!'
+            );
+        }
+    );
+
+
+// ==========================================
+// FILTERS
+// ==========================================
+
+$('filters')
+    .addEventListener(
+        'submit',
+        event =>
+            event.preventDefault()
+    );
+
+
+[
+    'search',
+    'typeFilter',
+    'categoryFilter',
+    'locationFilter',
+    'dateFilter'
+]
+    .forEach(id => {
+
+        $(id)
+            .addEventListener(
+                id === 'search'
+                    ? 'input'
+                    : 'change',
+
+                render
+            );
+    });
+
+
+$('filters')
+    .addEventListener(
+        'reset',
+        () =>
+            setTimeout(
+                render,
+                0
+            )
+    );
+
+
+// ==========================================
+// HOW IT WORKS
+// ==========================================
+
+const steps = [
+
+    [
+        'Report',
+        'Post details and a photo of your lost or found item. It takes less than a minute.'
+    ],
+
+    [
+        'Search',
+        'Browse listings and use filters to find possible matches by category, location or keywords.'
+    ],
+
+    [
+        'Reunite',
+        'Contact the person who posted the item and verify ownership before returning it.'
+    ]
+];
+
+
+[
+    'homeSteps',
+    'howSteps'
+]
+    .forEach(id =>
+
+        steps.forEach(
+            (
+                [title, description],
+                index
+            ) => {
+
+                const step =
+                    text(
+                        'div',
+                        '',
+                        'step'
+                    );
+
+
+                step.append(
+
+                    text(
+                        'div',
+                        index + 1,
+                        'step-number'
+                    ),
+
+                    text(
+                        'h3',
+                        title
+                    ),
+
+                    text(
+                        'p',
+                        description
+                    )
+                );
+
+
+                $(id).append(step);
+            }
+        )
+    );
+
+
+// ==========================================
+// ROUTING
+// ==========================================
+
+function route() {
+
+    const hash =
+        location.hash || '#/';
+
+
+    const path =
+        hash.split('?')[0];
+
+
+    const report =
+        path === '#/report';
+
+
+    const how =
+        path === '#/how-it-works';
+
+
+    const browse =
+        path === '#/browse';
+
+
+    $('homeHero').hidden =
+        report || how || browse;
+
+
+    $('browsePage').hidden =
+        report || how;
+
+
+    $('reportPage').hidden =
+        !report;
+
+
+    $('howPage').hidden =
+        !how;
+
+
+    $('browseHeading').hidden =
+        !browse;
+
+
+    $('homeSteps').hidden =
+        browse;
+
+
+    $('listingTitle').textContent =
+        browse
+            ? 'All Listings'
+            : 'Recent Listings';
+
+
+    if (report) {
+
+        const type =
+            new URLSearchParams(
+                hash.split('?')[1] || ''
+            )
+                .get('type');
+
+
+        if (
+            ['lost', 'found']
+                .includes(type)
+        ) {
+
+            $('reportForm')
+                .elements
+                .type
+                .value =
+                type;
+        }
+    }
+
+
+    document
+        .querySelectorAll(
+            '#navLinks a'
+        )
+        .forEach(a => {
+
+            const active =
+                a.getAttribute('href') ===
+                path;
+
+
+            a.classList.toggle(
+                'active',
+                active
+            );
+
+
+            if (active) {
+
+                a.setAttribute(
+                    'aria-current',
+                    'page'
+                );
+
+            }
+
+            else {
+
+                a.removeAttribute(
+                    'aria-current'
+                );
+            }
+        });
+
+
+    $('navLinks')
+        .classList
+        .remove('open');
+
+
+    $('menu')
+        .setAttribute(
+            'aria-expanded',
+            'false'
+        );
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'instant'
+    });
+}
 
 
 // ==========================================
 // MOBILE MENU
 // ==========================================
 
-mobileMenuBtn.addEventListener(
-    "click",
-    () => {
+$('menu')
+    .addEventListener(
+        'click',
+        () => {
 
-        mobileNav.classList.toggle(
-            "active"
-        );
-
-    }
-);
+            $('navLinks')
+                .classList
+                .toggle('open');
 
 
-document
-    .querySelectorAll(".mobile-nav a")
-    .forEach(link => {
-
-        link.addEventListener(
-            "click",
-            () => {
-
-                mobileNav.classList.remove(
-                    "active"
+            $('menu')
+                .setAttribute(
+                    'aria-expanded',
+                    String(
+                        $('navLinks')
+                            .classList
+                            .contains('open')
+                    )
                 );
-
-            }
-        );
-
-    });
+        }
+    );
 
 
-// ==========================================
-// DEFAULT DATE
-// ==========================================
-
-function setTodayDate() {
-
-    const dateInput =
-        document.getElementById("itemDate");
-
-    const today =
-        new Date();
-
-    const year =
-        today.getFullYear();
-
-    const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            today.getDate()
-        ).padStart(2, "0");
-
-
-    dateInput.value =
-        `${year}-${month}-${day}`;
-
-}
+window.addEventListener(
+    'hashchange',
+    route
+);
 
 
 // ==========================================
 // INITIALIZE
 // ==========================================
 
-setTodayDate();
+$('reportForm')
+    .elements
+    .date
+    .max =
+    today();
 
-displayItems(items);
 
-updateStats();
+$('reportForm')
+    .elements
+    .date
+    .value =
+    today();
+
+
+refreshLocations();
+
+stats();
+
+render();
+
+route();
+
+
+if (storageWarning) {
+    toast(storageWarning);
+}
